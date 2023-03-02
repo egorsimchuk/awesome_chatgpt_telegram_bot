@@ -1,2 +1,14 @@
 pytelegrambotapi
 python-telegram-bot
+pathlib
+typing
+openai
+loguru
+
+brunette
+isort
+autopep8
+autoflake
+pylint
+flake8
+loguru

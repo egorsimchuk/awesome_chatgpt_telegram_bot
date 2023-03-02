@@ -1,0 +1,40 @@
+"""Entrypoint"""
+import json
+from pathlib import Path
+from typing import Any, Dict
+
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+
+from src.user_data.container import UserModels
+
+
+async def start(update, context):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hello! I'm a chat-gpt bot.")
+
+
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the user message."""
+    input_message = update.message.text
+    model = models.get_model(update.message.chat.id, config["openai_token"])
+    await update.message.reply_text(model.get_response(input_message))
+
+
+def run_bot(config: Dict[str, Any]):
+    """Start the bot."""
+    application = Application.builder().token(config["telegram_token"]).build()
+
+    # on different commands - answer in Telegram
+    application.add_handler(CommandHandler("start", start))
+
+    # on non command i.e message - echo the message on Telegram
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+
+    application.run_polling()
+
+
+if __name__ == "__main__":
+    with open(Path(__file__).parents[1] / "configs/config.json", "rb") as f:
+        config = json.load(f)
+    models = UserModels()
+    run_bot(config)
