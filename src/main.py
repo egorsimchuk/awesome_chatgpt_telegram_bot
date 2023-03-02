@@ -1,8 +1,8 @@
 """Entrypoint"""
 import json
 from pathlib import Path
-from typing import Any, Dict
 
+from loguru import logger
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
@@ -17,10 +17,12 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     input_message = update.message.text
     model = models.get_model(update.message.chat.id, config["openai_token"])
-    await update.message.reply_text(model.get_response(input_message))
+    response = await model.get_response(input_message)
+    logger.info(f"chat_id:{update.message.chat.id}, response:\n{response}")
+    await update.message.reply_text(response)
 
 
-def run_bot(config: Dict[str, Any]):
+def run_bot():
     """Start the bot."""
     application = Application.builder().token(config["telegram_token"]).build()
 
@@ -30,6 +32,7 @@ def run_bot(config: Dict[str, Any]):
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
+    logger.info("Start listening.")
     application.run_polling()
 
 
@@ -37,4 +40,4 @@ if __name__ == "__main__":
     with open(Path(__file__).parents[1] / "configs/config.json", "rb") as f:
         config = json.load(f)
     models = UserModels()
-    run_bot(config)
+    run_bot()
