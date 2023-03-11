@@ -4,6 +4,7 @@ pathlib
 typing
 openai
 loguru
+pydantic
 
 brunette
 isort
