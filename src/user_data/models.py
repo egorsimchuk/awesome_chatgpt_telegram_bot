@@ -1,7 +1,7 @@
 """Container for users models"""
 from typing import Dict
 
-from src.chat_gpt.model import ChatGPT
+from chat_gpt.model import ChatGPT
 
 
 class UserModels:

@@ -1,11 +1,9 @@
-import asyncio
 import json
 import time
 
-import pytest
 from pathlib import Path
 
-from src.chat_gpt.model import ChatGPT
+from chat_gpt.model import ChatGPT
 
 with open(Path(__file__).parents[1]/"configs/config.json", "rb")as f:
     config = json.load(f)

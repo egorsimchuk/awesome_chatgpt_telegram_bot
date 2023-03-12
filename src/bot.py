@@ -6,7 +6,14 @@ from loguru import logger
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-from src.user_data.container import UserModels
+from user_data.database import Database
+from user_data.models import UserModels
+
+db = Database()
+
+
+async def register_user(update, context):
+    db.create_user_if_not_exist(update.effective_chat.id)
 
 
 async def start(update, context):

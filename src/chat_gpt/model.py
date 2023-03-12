@@ -1,4 +1,5 @@
 """Chat gpt api processor"""
+import json
 from asyncio import sleep
 from typing import Dict, List, Optional
 
@@ -7,6 +8,8 @@ from loguru import logger
 from openai import InvalidRequestError
 from openai.error import RateLimitError
 from pydantic import BaseModel
+
+from utils import get_path_from_root_dir
 
 
 class ProcessorParams(BaseModel):
@@ -27,14 +30,19 @@ class ChatGPT:
         openai.api_key = api_key
         self.processor_params = ProcessorParams(**processor_params) if processor_params else ProcessorParams()
         self.model_params = ModelParams(**model_params) if model_params else ModelParams()
+        with open(get_path_from_root_dir("configs/chat_modes.json"), "rb") as f:
+            self._chat_modes = json.load(f)
         self._conversation: List[Dict[str, str]] = [
             {
                 "role": "system",
-                "content": "As an advanced chatbot named ChatGPT, your primary goal is to assist users to the best of your ability. This may involve answering questions, providing helpful information, or completing tasks based on user input. In order to effectively assist users, it is important to be detailed and thorough in your responses. Use examples and evidence to support your points and justify your recommendations or solutions. Remember to always prioritize the needs and satisfaction of the user. Your ultimate goal is to provide a helpful and enjoyable experience for the user.",
+                "content": "",
             }
         ]
 
-    def get_response(self, input_message: str):
+    def get_response(
+        self,
+        input_message: str,
+    ):
         self._conversation.append({"role": "user", "content": input_message})
         response = self._fetch_responce()
         self._conversation.append({"role": "assistant", "content": response})

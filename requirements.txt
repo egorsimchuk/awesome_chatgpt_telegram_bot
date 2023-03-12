@@ -5,6 +5,7 @@ typing
 openai
 loguru
 pydantic
+pymongo
 
 brunette
 isort
