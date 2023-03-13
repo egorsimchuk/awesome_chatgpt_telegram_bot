@@ -1,5 +1,5 @@
-import pymongo as pymongo
-from loguru import logger
+"""Database for storing users info"""
+import pymongo
 from pymongo.collection import Collection
 
 from utils import utc_now
@@ -19,9 +19,17 @@ class Database:
         if self.users.find_one({"_id": user_id}) is None:
             self._create_user(user_id, username)
 
-    def get_last_interaction_timestamp(self, user_id):
-        row = self.users.find_one({"_id": user_id})
-        if row:
-            return row["last_interaction_timestamp"]
-        else:
-            logger.warning(f"Try fetch last_interaction_timestamp for not-existing user_id {user_id}")
+    def _get_user_row(self, user_id: int):
+        return self.users.find_one({"_id": user_id})
+
+    def get_last_interaction_timestamp(self, user_id: int):
+        return self._get_user_row(user_id)["last_interaction_timestamp"]
+
+    def update_interaction_timestamp(self, user_id: int):
+        self.users.update_one({"_id": user_id}, {"$set": {"last_interaction_timestamp": utc_now()}})
+
+    def get_openai_api_key(self, user_id: int):
+        return self._get_user_row(user_id).get("openai_api_key")
+
+    def set_openai_api_key(self, user_id: int, api_key: str):
+        self.users.update_one({"_id": user_id}, {"$set": {"openai_api_key": api_key}})
