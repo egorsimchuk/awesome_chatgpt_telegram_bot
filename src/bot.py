@@ -34,7 +34,7 @@ async def register_user(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     db.create_user_if_not_exist(chat_id, update.effective_chat.username)
     if db.get_openai_api_key(chat_id) is None:
-        await context.bot.send_message(chat_id=chat_id, text="Please set your openai api key with /set_api_key your_key")
+        await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
 
 
 async def set_openai_api_key(update: Update, context: CallbackContext):
@@ -46,12 +46,12 @@ async def set_openai_api_key(update: Update, context: CallbackContext):
         )
     else:
         db.set_openai_api_key(update.effective_chat.id, context.args[0])
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Openai api key is updated")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Openai api key was updated.")
 
 
 async def start(update, context):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"🧠 Welcome to chat-gpt bot 🤖\n{HELP_MESSAGE}")
     await register_user(update, context)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Hello! I'm a chat-gpt bot.\n{HELP_MESSAGE}")
 
 
 async def switch_mode(update, context):
@@ -66,7 +66,14 @@ async def switch_mode(update, context):
 async def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     chat_id = update.effective_chat.id
-    model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
+
+    api_key = db.get_openai_api_key(chat_id)
+    if api_key is None:
+        await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
+        return
+
+    model = models.get_model(chat_id, api_key)
+
     if utc_now() - db.get_last_interaction_timestamp(chat_id) > CHAT_TIMEOUT_SEC:
         await context.bot.send_message(
             chat_id=chat_id,

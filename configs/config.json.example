@@ -1,5 +1,4 @@
 {
   "telegram_token": "",
-  "openai_api_key": "",
   "allowed_users": [""]
 }

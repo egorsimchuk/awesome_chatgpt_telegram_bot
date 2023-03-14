@@ -7,7 +7,7 @@ from utils import utc_now
 
 class Database:
     def __init__(self):
-        self.client = pymongo.MongoClient("mongodb://mongo:mongo@localhost:27017/")
+        self.client = pymongo.MongoClient("mongodb://mongo:27017/")
         self.db = self.client["database"]
         self.users: Collection = self.db["users"]
         self.messages: Collection = self.db["messages"]

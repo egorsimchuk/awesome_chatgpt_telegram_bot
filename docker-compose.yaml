@@ -1,14 +1,27 @@
 version: "3.9"
 
 services:
-  mongo:
+  db:
     container_name: mongo
     image: mongo:latest
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
     ports:
       - "27017:27017"
     volumes:
       - ./mongodb:/opt/data
+    networks:
+      - bot_net
+
+  bot:
+    depends_on:
+      - db
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - bot_net
+
+networks:
+  bot_net:
+    driver: bridge
