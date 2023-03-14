@@ -1,7 +1,7 @@
 """Chat gpt api processor"""
 import json
 from asyncio import sleep
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import openai
 from loguru import logger
@@ -36,6 +36,10 @@ class ChatGPT:
             self._chat_modes = json.load(f)
         self._conversation: List[Dict[str, str]] = None
 
+    @property
+    def conversation_initialized(self):
+        return self._conversation is not None
+
     def set_openai_api_key(self, api_key: str):
         openai.api_key = api_key
         return self
@@ -51,14 +55,15 @@ class ChatGPT:
     def get_response(
         self,
         input_message: str,
-    ):
+    ) -> Union[str, Exception]:
         self._conversation.append({"role": "user", "content": input_message})
         response = self._fetch_responce()
-        self._conversation.append({"role": "assistant", "content": response})
+        if isinstance(response, str):
+            self._conversation.append({"role": "assistant", "content": response})
         return response
 
-    def _fetch_responce(self):
-        err_message = None
+    def _fetch_responce(self) -> str:
+        error = None
         for i in range(self.processor_params.response_attempts):
             try:
                 response = openai.ChatCompletion.create(
@@ -66,17 +71,20 @@ class ChatGPT:
                 )
                 break
             except InvalidRequestError as err:
-                err_message = err.error.message
-                logger.error(f"Try {i}/{self.processor_params.response_attempts}. {err_message}")
+                error = err
+                logger.error(f"Try {i}/{self.processor_params.response_attempts}. {err.error.message}")
                 self._clip_conversation_history()
             except RateLimitError as err:
-                err_message = err.error.message
-                logger.error(f"Try {i}/{self.processor_params.response_attempts}. {err_message}")
+                error = err
+                logger.error(f"Try {i}/{self.processor_params.response_attempts}. {err.error.message}")
                 sleep(self.processor_params.wait_after_rate_limit_error)
+            except Exception as err:
+                error = err
+                break
         try:
             return response["choices"][0]["message"]["content"]
         except NameError:
-            return err_message
+            return error
 
     def _clip_conversation_history(self, n: int = 1):
         for _ in range(n):
