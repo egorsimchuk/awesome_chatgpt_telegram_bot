@@ -26,16 +26,25 @@ class ModelParams(BaseModel):
 
 
 class ChatGPT:
-    def __init__(self, api_key: str, processor_params: Optional[Dict] = None, model_params: Optional[Dict] = None):
-        openai.api_key = api_key
+    def __init__(
+        self, processor_params: Optional[Dict] = None, model_params: Optional[Dict] = None, api_key: Optional[str] = None
+    ):
         self.processor_params = ProcessorParams(**processor_params) if processor_params else ProcessorParams()
         self.model_params = ModelParams(**model_params) if model_params else ModelParams()
+        self.set_openai_api_key(api_key)
         with open(get_path_from_root_dir("configs/chat_modes.json"), "rb") as f:
             self._chat_modes = json.load(f)
+        self._conversation: List[Dict[str, str]] = None
+
+    def set_openai_api_key(self, api_key: str):
+        openai.api_key = api_key
+        return self
+
+    def switch_mode(self, promt: str):
         self._conversation: List[Dict[str, str]] = [
             {
                 "role": "system",
-                "content": "",
+                "content": promt,
             }
         ]
 
