@@ -4,6 +4,8 @@
 
 Welcome to the "Awesome ChatGPT Telegram Bot" repository!
 
+![ezgif com-resize](https://user-images.githubusercontent.com/18515081/225130702-a463f73d-0e52-45ec-9891-d27fc7aedb35.gif)
+
 The thanks list 🖤:
 - Promts were taken from [awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts).
 - Some ideas were gathered from [chatgpt_telegram_bot](https://github.com/karfly/chatgpt_telegram_bot).
