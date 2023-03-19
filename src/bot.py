@@ -92,6 +92,7 @@ async def start_new_chat(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
     model.switch_mode(chat_modes[DEFAULT_MODE]["promt"])
+    db.update_interaction_timestamp(chat_id)
     await context.bot.send_message(chat_id=chat_id, text="🍌 New chat with assistant started.")
 
 
