@@ -60,6 +60,7 @@ async def switch_mode(update, context):
     mode = update.message.text[1:]
     promt = chat_modes[mode]["promt"]
     model.switch_mode(promt)
+    db.update_interaction_timestamp(chat_id)
     await context.bot.send_message(chat_id=chat_id, text=f"💭 Chat mode switched to {mode}. ⚙️Promt:\n{promt}")
 
 
