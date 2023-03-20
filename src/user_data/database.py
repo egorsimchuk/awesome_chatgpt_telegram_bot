@@ -29,7 +29,9 @@ class Database:
         self.users.update_one({"_id": user_id}, {"$set": {"last_interaction_timestamp": utc_now()}})
 
     def get_openai_api_key(self, user_id: int):
-        return self._get_user_row(user_id).get("openai_api_key")
+        user_row = self._get_user_row(user_id)
+        if user_row:
+            return user_row.get("openai_api_key")
 
     def set_openai_api_key(self, user_id: int, api_key: str):
         self.users.update_one({"_id": user_id}, {"$set": {"openai_api_key": api_key}})
