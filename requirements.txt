@@ -5,7 +5,7 @@ typing
 openai
 loguru
 pydantic
-pymongo
+pymongo==3.8.0
 
 brunette
 isort

@@ -9,8 +9,6 @@ services:
       - "27017:27017"
     volumes:
       - ./mongodb:/opt/data
-    networks:
-      - bot_net
 
   bot:
     depends_on:
@@ -19,9 +17,3 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    networks:
-      - bot_net
-
-networks:
-  bot_net:
-    driver: bridge
