@@ -1,6 +1,7 @@
 FROM python:3.8-slim
 
 ENV PYTHONPATH=/opt/app
+ENV LOGURU_LEVEL="DEBUG"
 WORKDIR /opt/app
 
 COPY ./requirements.txt /tmp/requirements.txt
