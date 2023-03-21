@@ -69,10 +69,10 @@ async def switch_mode(update, context):
 
 async def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
-    await register_user(update, context)
-
     chat_id = update.effective_chat.id
-    model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
+    openai_api_key = db.get_openai_api_key(chat_id)
+    await register_user(update, context, openai_api_key)
+    model = models.get_model(chat_id, openai_api_key)
 
     if utc_now() - db.get_last_interaction_timestamp(chat_id) > CHAT_TIMEOUT_SEC:
         await context.bot.send_message(
