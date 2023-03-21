@@ -30,10 +30,11 @@ models = UserModels()
 db = Database()
 
 
-async def register_user(update: Update, context: CallbackContext):
+async def register_user(update: Update, context: CallbackContext, openai_api_key: str = None):
     chat_id = update.effective_chat.id
     db.create_user_if_not_exist(chat_id, update.effective_chat.username)
-    if db.get_openai_api_key(chat_id) is None:
+    openai_api_key = openai_api_key or db.get_openai_api_key(chat_id)
+    if openai_api_key is None:
         await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
 
 
