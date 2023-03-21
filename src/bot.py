@@ -38,6 +38,7 @@ async def register_user(update: Update, context: CallbackContext):
 
 
 async def set_openai_api_key(update: Update, context: CallbackContext):
+    await register_user(update, context)
     if not context.args:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -55,6 +56,7 @@ async def start(update, context):
 
 
 async def switch_mode(update, context):
+    await register_user(update, context)
     chat_id = update.effective_chat.id
     model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
     mode = update.message.text[1:]
@@ -66,8 +68,9 @@ async def switch_mode(update, context):
 
 async def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
-    chat_id = update.effective_chat.id
+    await register_user(update, context)
 
+    chat_id = update.effective_chat.id
     api_key = db.get_openai_api_key(chat_id)
     if api_key is None:
         await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
@@ -90,6 +93,7 @@ async def echo(update: Update, context: CallbackContext) -> None:
 
 
 async def start_new_chat(update: Update, context: CallbackContext):
+    await register_user(update, context)
     chat_id = update.effective_chat.id
     model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
     model.switch_mode(chat_modes[DEFAULT_MODE]["promt"])
