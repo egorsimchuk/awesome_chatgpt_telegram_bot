@@ -71,12 +71,7 @@ async def echo(update: Update, context: CallbackContext) -> None:
     await register_user(update, context)
 
     chat_id = update.effective_chat.id
-    api_key = db.get_openai_api_key(chat_id)
-    if api_key is None:
-        await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
-        return
-
-    model = models.get_model(chat_id, api_key)
+    model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
 
     if utc_now() - db.get_last_interaction_timestamp(chat_id) > CHAT_TIMEOUT_SEC:
         await context.bot.send_message(
