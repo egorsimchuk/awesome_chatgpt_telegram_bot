@@ -6,5 +6,3 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    networks:
-      - bot_net
