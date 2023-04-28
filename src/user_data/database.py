@@ -18,7 +18,7 @@ class Database:
             self._create_user(user_id, username)
 
     def _get_user_row(self, user_id: int):
-        return self.users.get(user_id)
+        return self.users.get(user_id, {})
 
     def get_last_interaction_timestamp(self, user_id: int):
         return self._get_user_row(user_id)["last_interaction_timestamp"]
