@@ -11,3 +11,7 @@ lint:
 	export PYTHONPATH=${SRC_DIR} && pylint --rcfile setup.cfg ${SRC_DIR}
 	export PYTHONPATH=${SRC_DIR} && flake8 ${SRC_DIR}
 	brunette --check ${SRC_DIR}
+
+
+test:
+	export PYTHONPATH=src/ && pytest . --verbosity=2 --showlocals --strict-markers --log-level=DEBUG --disable-pytest-warnings
