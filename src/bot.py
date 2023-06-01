@@ -30,14 +30,16 @@ models = UserModels()
 db = Database()
 
 
-async def register_user(update: Update, context: CallbackContext):
+async def register_user(update: Update, context: CallbackContext, openai_api_key: str = None):
     chat_id = update.effective_chat.id
     db.create_user_if_not_exist(chat_id, update.effective_chat.username)
-    if db.get_openai_api_key(chat_id) is None:
+    openai_api_key = openai_api_key or db.get_openai_api_key(chat_id)
+    if openai_api_key is None:
         await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
 
 
 async def set_openai_api_key(update: Update, context: CallbackContext):
+    await register_user(update, context)
     if not context.args:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -55,6 +57,7 @@ async def start(update, context):
 
 
 async def switch_mode(update, context):
+    await register_user(update, context)
     chat_id = update.effective_chat.id
     model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
     mode = update.message.text[1:]
@@ -67,13 +70,9 @@ async def switch_mode(update, context):
 async def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     chat_id = update.effective_chat.id
-
-    api_key = db.get_openai_api_key(chat_id)
-    if api_key is None:
-        await context.bot.send_message(chat_id=chat_id, text="Please set openai api key with /set_api_key command.")
-        return
-
-    model = models.get_model(chat_id, api_key)
+    openai_api_key = db.get_openai_api_key(chat_id)
+    await register_user(update, context, openai_api_key)
+    model = models.get_model(chat_id, openai_api_key)
 
     if utc_now() - db.get_last_interaction_timestamp(chat_id) > CHAT_TIMEOUT_SEC:
         await context.bot.send_message(
@@ -90,6 +89,7 @@ async def echo(update: Update, context: CallbackContext) -> None:
 
 
 async def start_new_chat(update: Update, context: CallbackContext):
+    await register_user(update, context)
     chat_id = update.effective_chat.id
     model = models.get_model(chat_id, db.get_openai_api_key(chat_id))
     model.switch_mode(chat_modes[DEFAULT_MODE]["promt"])

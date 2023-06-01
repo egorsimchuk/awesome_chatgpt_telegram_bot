@@ -52,10 +52,9 @@ class ChatGPT:
             }
         ]
 
-    def get_response(
-        self,
-        input_message: str,
-    ) -> Union[str, Exception]:
+    def get_response(self, input_message: str) -> Union[str, Exception]:
+        if not self.conversation_initialized:
+            raise ValueError("Conversation not initialized")
         self._conversation.append({"role": "user", "content": input_message})
         response = self._fetch_responce()
         if isinstance(response, str):

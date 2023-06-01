@@ -1,18 +1,7 @@
 version: "3.3"
 
 services:
-  db:
-    container_name: mongo
-    image: mongo:latest
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./mongodb:/opt/data
-
   bot:
-    depends_on:
-      - db
     restart: always
     build:
       context: .
